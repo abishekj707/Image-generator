@@ -42,6 +42,8 @@ const BuyCredit = () => {
         //if the user is logged in then will make api call to the razorpay api in backend
         const {data}= await axios.post(backendUrl + '/api/user/pay-razor', {planId},
         {headers: {token}}) //our middleware will get this token and find the user id
+
+        console.log("razorpay response", data);
         if (data.success){ //it will initialize the payment 
             initPay(data.order)  //when the data.success is true we will call the initPay bcz in response we will get the order
         }
