@@ -32,9 +32,11 @@ const BuyCredit = () => {
     }
 
     const paymentRazorpay = async(planId)=>{ //onClick func
+      console.log("payment clicked")
       try {
         if(!user){
           setShowLogin(true)
+          return
         }
 
         //if the user is logged in then will make api call to the razorpay api in backend
