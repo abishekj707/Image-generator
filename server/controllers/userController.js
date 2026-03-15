@@ -92,7 +92,7 @@ const paymentRazorpay = async(req, res) =>{
         let credits, plan, amount, date
 
         switch(planId){ //switch case for different plans and gettng the planId from req.body
-            case 'basic':
+            case 'Basic':
                 plan = 'Basic'
                 credits = 100
                 amount = 10
