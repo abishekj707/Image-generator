@@ -42,7 +42,7 @@ const BuyCredit = () => {
         {headers: {token}}) //our middleware will get this token and find the user id
         if (data.success){ //it will initialize the payment 
             initPay(data.order)  //when the data.success is true we will call the initPay bcz in response we will get the order
-        }  
+        }
       } catch (error) {
         toast.error(error.message)
       }
