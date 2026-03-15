@@ -116,7 +116,7 @@ const paymentRazorpay = async(req, res) =>{
                 return res.json({success: false, message: 'Invalid Plan'})
         }
 
-        date = date.now()
+        //date = Date.now()
 
         const transactionData = {
             userId, plan, credits, amount, date
