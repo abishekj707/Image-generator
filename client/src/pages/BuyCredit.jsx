@@ -21,9 +21,19 @@ const BuyCredit = () => {
         name: 'Credits Payment',
         description: 'Credits Payment',
         order_id: order.id,
-        recipt: order.recipt,
+        receipt: order.receipt,
         handler: async (response)=>{
-          console.log(response);
+          try {
+            const {data} = await axios.post(backendUrl + '/api/user/verify-razor', response, {headers: {token}}) //axios for calling api after the payment is done in frontend we will get the response from razorpay and then we will send this response to the backend to verify the payment and update the user credits in the database if the payment is successful
+            if(data.success){
+              loadCreditsData()//after verifying the payment we will again load the user credits
+              navigate('/') //after the payment is successful we will navigate to the home page
+              toast.success("Payment successful! Credits added to your account.")
+            }
+
+          } catch (error) {
+              toast.error(error.message)
+          }
 
         }
       }

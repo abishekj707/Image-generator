@@ -144,4 +144,36 @@ const paymentRazorpay = async(req, res) =>{
     }
 }
 
-export {registerUser, loginUser, userCredits, paymentRazorpay} // using this controller function we should create api endpoints in routes folder, and then we can use those endpoints in frontend to make the api calls for registration, login, getting user credits and making payment using razorpay
+const verifyRazorpay = async (req, res) => {
+    try {
+        
+        const {razorpay_order_id} = req.body
+
+        const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id)//fetch method is used to get the order details from razorpay using the order id, and it will return the order details in the orderInfo variable
+
+        if(orderInfo.status === 'paid'){ //if the order status is paid, then we can update the user credits in the database
+            const transactionData = await transactionModel.findById(orderInfo.receipt)//receipt is the unique identifier for the order, which we have stored in the transaction data, so we can use that receipt to find the transaction data from the database
+
+            if(transactionData.payment){ //if the payment is already done or verified, then we can return the success response, because we have already updated the user credits in the database
+                return res.json({success: false, message: 'Payment failed'})
+            }
+
+            //else if transactionData.payment is false, then we can update the credits in the database, and also update the payment status in the transaction data to true, so that we can avoid duplicate payments and credits update in the future
+            const userData = await userModel.findById(transactionData.userId) //we can get the user data using the userId from the transaction data
+
+            const creditBalance = userData.creditBalance + transactionData.credits //userData.creditBalance is the user's current credit balance, and transactionData.credits is the credits that we have to add to the user's credit balance after the purchase, so we can add these two to get the updated credit balance
+            await userModel.findByIdAndUpdate(userData._id, {creditBalance}) //we can update the user's credit balance in the database using the user id and update the creditBalance
+        
+            await transactionModel.findByIdAndUpdate(transactionData._id, {payment: true}) //we can update the payment status in the transaction data and in db to true, so that we can avoid duplicate payments and credits update in the future
+        
+            res.json({success: true, message: 'credits added successfully'})
+        }else{
+            res.json({success: false, message: 'Payment failed'})
+        }
+    } catch (error) {
+        console.log(error)
+        res.json({success: false, message: error.message})
+    }
+}
+
+export {registerUser, loginUser, userCredits, paymentRazorpay, verifyRazorpay} // using this controller function we should create api endpoints in routes folder, and then we can use those endpoints in frontend to make the api calls for registration, login, getting user credits and making payment using razorpay
